@@ -1,0 +1,53 @@
+ 
+ TITLE:
+ 20_30_cor_m
+ 
+ DATA:
+  FILE=data ef-pos-0.2-20-30_1.dat;
+  !TYPE = MONTECARLO;
+ 
+ VARIABLE: 
+  NAMES = GroupID MemID w1j x1 x2 x3 Y; 
+  USEVAR= GroupID w1j x1 x2 x3 Y;
+  CLUSTER = GroupID;
+  WITHIN = x1 x2 x3;
+  BETWEEN = w1j;
+  
+ ANALYSIS:
+  TYPE IS TWOLEVEL RANDOM;
+  ESTIMATOR = BAYES;
+  PROCESSORS = 2;
+  BITERATIONS = 70000 (2000);
+ 
+ MODEL:
+  %WITHIN%
+  Y*2.4268625;
+  b1j| Y ON x1;
+  b2j| Y ON x2;
+  b3j| Y ON x3;
+  
+  %BETWEEN%
+  Y b1j b2j b3j;
+  [Y*0];
+  [b1j*2.3] (b10);
+  [b2j*-0.25] (b20);
+  [b3j*-0.75] (b30);
+  Y ON w1j*1.5(b01);
+  b1j ON w1j*0.12(b11);
+  b2j ON w1j*-0.05(b21);
+  b3j ON w1j*-0.75(b31);
+  Y*2.1977;
+  b1j-b3j*0.5;
+ 
+ MODEL PRIORS:
+ b01~N(1.5,0.3);
+ b11~N(0.12,0.024);
+ b21~N(-0.05,0.01);
+ b31~N(-0.75,0.15);
+ b10~N(2.3,0.46);
+ b20~N(-0.25,0.05);
+ b30~N(-0.75,0.15);
+ 
+ OUTPUT:
+  TECH1 TECH8 CINT;! TECH9
+ 
